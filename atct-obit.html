@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Cáo phó · Hoa Viên Nghĩa Trang Bình Dương</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #050508;
+      --card-bg: #111319;
+      --accent: #f4b528;
+      --accent-soft: #f8d070;
+      --text: #f7f7fb;
+      --muted: #a6acc7;
+      --shadow-soft: 0 18px 45px rgba(0,0,0,0.8);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1c1f2c 0, #050508 55%);
+      color: var(--text);
+      font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .obit-shell {
+      width: 100%;
+      max-width: 520px;
+      border-radius: 18px;
+      background: #050506;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(248,220,140,0.5);
+    }
+    .obit-header {
+      padding: 18px 16px 8px;
+      text-align: center;
+      background: radial-gradient(circle at top, #252525 0, #050506 55%);
+    }
+    .obit-title-top {
+      font-family: "Montserrat", system-ui;
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-soft);
+      font-weight: 700;
+    }
+    .obit-subtitle {
+      margin-top: 4px;
+      font-size: 16px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .obit-photo-placeholder {
+      width: 210px;
+      height: 210px;
+      border-radius: 999px;
+      margin: 12px auto 8px;
+      background: radial-gradient(circle at 30% 20%, #444 0, #111 55%, #000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ccc;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      border: 3px solid rgba(248,220,140,0.9);
+      overflow: hidden;
+    }
+    .obit-name-block {
+      padding: 4px 16px 12px;
+      text-align: center;
+    }
+    .obit-role {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 4px;
+    }
+    .obit-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent-soft);
+    }
+    .obit-name-alt {
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .obit-body {
+      padding: 8px 20px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #f3f4ff;
+    }
+    .obit-section-title {
+      margin-top: 12px;
+      margin-bottom: 4px;
+      font-weight: 700;
+      color: var(--accent-soft);
+      text-transform: uppercase;
+      font-size: 13px;
+      display: block;
+    }
+    .obit-footer {
+      padding: 10px 16px 14px;
+      text-align: center;
+      font-size: 13px;
+      border-top: 1px solid rgba(248,220,140,0.4);
+      color: var(--accent-soft);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .status-bar {
+      text-align: center;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .status-bar a {
+      color: var(--accent-soft);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+<div class="obit-shell" id="obit-shell" style="display:none;">
+  <div class="obit-header">
+    <div class="obit-title-top">HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG</div>
+    <div class="obit-subtitle">VÔ CÙNG THƯƠNG TIẾC</div>
+    <div class="obit-photo-placeholder" id="obit-photo-slot">
+      <span>Ảnh chân dung</span>
+    </div>
+  </div>
+
+  <div class="obit-name-block">
+    <div class="obit-role" id="obit-role">CÁO PHÓ</div>
+    <div class="obit-name" id="obit-name">Họ tên người mất</div>
+    <div class="obit-name-alt" id="obit-name-alt"></div>
+  </div>
+
+  <div class="obit-body" id="obit-body"></div>
+
+  <div class="obit-footer" id="obit-footer">
+    LINH CỮU AN TÁNG TẠI HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG
+  </div>
+</div>
+
+<div class="status-bar" id="status-bar">Đang tải dữ liệu...</div>
+
+<script>
+  const API_BASE_URL = "https://cphaco-backend-api.onrender.com";
+
+  const shellEl = document.getElementById("obit-shell");
+  const statusEl = document.getElementById("status-bar");
+  const obitNameEl = document.getElementById("obit-name");
+  const obitNameAltEl = document.getElementById("obit-name-alt");
+  const obitBodyEl = document.getElementById("obit-body");
+  const obitFooterEl = document.getElementById("obit-footer");
+
+  function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+  }
+
+  function formatDateTime(dtStr) {
+    if (!dtStr) return "";
+    const d = new Date(dtStr);
+    if (Number.isNaN(d.getTime())) return dtStr;
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    return `${hh} giờ ${mi} · ${dd}/${mm}/${yyyy}`;
+  }
+
+  function calcAge(birthYear, refDateStr) {
+    if (!birthYear) return null;
+    const y = Number(birthYear);
+    if (!y) return null;
+    const ref = refDateStr ? new Date(refDateStr) : new Date();
+    const age = ref.getFullYear() - y;
+    return age > 0 ? age : null;
+  }
+
+  async function loadObit() {
+    const jobId = getQueryParam("job");
+    if (!jobId) {
+      statusEl.textContent = "Thiếu thông tin mã hồ sơ (job). Vui lòng kiểm tra lại mã QR.";
+      return;
+    }
+
+    try {
+      const url = `${API_BASE_URL}/api/atct/jobs/${encodeURIComponent(jobId)}`;
+      console.log("Calling:", url);
+      const res = await fetch(url);
+      if (!res.ok) {
+        statusEl.textContent = "Không tìm thấy dữ liệu cáo phó. (Mã: " + res.status + ")";
+        return;
+      }
+      const data = await res.json();
+      if (!data.ok || !data.item) {
+        statusEl.textContent = "Không tìm thấy dữ liệu cáo phó.";
+        return;
+      }
+
+      const r = data.item;
+      const ev = {
+        name: r.deceased?.name,
+        birth_year: r.deceased?.birth_year,
+        time_of_death: r.time_of_death,
+        time_of_funeral: r.time_of_funeral,
+        lunar_date: r.lunar_date,
+        departure_place: r.departure_place,
+        position: r.position || {}
+      };
+
+      const age = calcAge(ev.birth_year, ev.time_of_death || ev.time_of_funeral);
+      obitNameEl.textContent = ev.name || "";
+      obitNameAltEl.textContent = age ? `Hưởng thọ ${age} tuổi` : "";
+
+      const lines = [];
+      if (ev.birth_year) {
+        lines.push(`Sinh năm: ${ev.birth_year}.`);
+      }
+      if (ev.time_of_death) {
+        lines.push(`Từ trần lúc ${formatDateTime(ev.time_of_death)}${ev.lunar_date ? " (nhằm ngày " + ev.lunar_date + ")" : ""}.`);
+      }
+      if (ev.time_of_funeral) {
+        lines.push('<span class="obit-section-title">NGHI THỨC ĐỘNG QUAN</span>');
+        lines.push(`Lễ động quan lúc ${formatDateTime(ev.time_of_funeral)}.`);
+      }
+      if (ev.departure_place) {
+        lines.push(`Xuất phát từ: ${ev.departure_place}.`);
+      }
+
+      const pos = ev.position;
+      const posText = pos.khu
+        ? `${pos.khu}${pos.tieukhu ? " · " + pos.tieukhu : ""}${pos.row ? " · Hàng " + pos.row : ""}${pos.index ? " · Ô " + pos.index : ""}`
+        : "";
+
+      lines.push('<span class="obit-section-title">NƠI AN TÁNG</span>');
+      if (posText) {
+        lines.push(`Linh cữu an táng tại: ${posText}, Hoa Viên Nghĩa Trang Bình Dương.`);
+      } else {
+        lines.push(`Linh cữu an táng tại Hoa Viên Nghĩa Trang Bình Dương.`);
+      }
+
+      obitBodyEl.innerHTML = lines
+        .map((ln) => ln.startsWith("<span") ? ln : `<div>${ln}</div>`)
+        .join("");
+
+      obitFooterEl.textContent =
+        "LINH CỮU AN TÁNG TẠI HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG";
+
+      statusEl.textContent = "";
+      shellEl.style.display = "block";
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = "Không tải được dữ liệu cáo phó. Vui lòng kiểm tra kết nối.";
+    }
+  }
+
+  loadObit();
+</script>
+</body>
+</html>

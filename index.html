@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Danh sách An táng / Cải táng · Hoa Viên Nghĩa Trang Bình Dương</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        .page-header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 999px;
+            border: 1px solid rgba(248, 220, 140, 0.85);
+            background: radial-gradient(circle at 30% 20%, #f4b528 0, #7a5a1c 40%, #000 100%);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.65);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-logo img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+
+        .brand-text {
+            text-align: left;
+        }
+
+        @media (max-width: 600px) {
+            .brand-text {
+                text-align: center;
+            }
+        }
+
+        /* logo trên modal cáo phó */
+        .obit-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 999px;
+            border: 1px solid rgba(248, 220, 140, 0.9);
+            background: radial-gradient(circle at 30% 20%, #f4b528 0, #7a5a1c 40%, #000 100%);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.75);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+        }
+
+        .obit-logo img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+
+        :root {
+            --bg: #050508;
+            --card-bg: #111319;
+            --card-border: #272a36;
+            --accent: #f4b528;
+            --accent-soft: #f8d070;
+            --text: #f7f7fb;
+            --muted: #a6acc7;
+            --danger: #ff6b6b;
+            --radius-lg: 16px;
+            --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #1c1f2c 0, #050508 55%);
+            color: var(--text);
+            font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 24px 16px 80px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-family: "Montserrat", system-ui;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--accent-soft);
+        }
+
+        .page-subtitle {
+            margin-top: 8px;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .page-desc {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .filters-row {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .chip {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(244, 181, 40, 0.3);
+            color: var(--accent-soft);
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .list-container {
+            margin-top: 28px;
+            background: rgba(4, 6, 12, 0.8);
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            padding: 12px 12px 4px;
+            backdrop-filter: blur(16px);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px 10px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .list-header div {
+            flex: 1;
+        }
+
+        .list-header div:nth-child(2) {
+            flex: 2;
+        }
+
+        .events-list {
+            max-height: calc(100vh - 230px);
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .event-card {
+            display: grid;
+            grid-template-columns: 100px minmax(0, 1.6fr) minmax(0, 1.2fr);
+            gap: 10px;
+            align-items: center;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            border-radius: 12px;
+            background: radial-gradient(circle at left, rgba(244, 181, 40, 0.18), rgba(6, 9, 20, 0.9));
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            border-color: rgba(244, 181, 40, 0.7);
+        }
+
+        .event-time {
+            font-size: 13px;
+            color: var(--accent-soft);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .event-name {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .event-meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .event-location {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .event-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 999px;
+            border: 1px solid rgba(244, 181, 40, 0.6);
+            font-size: 11px;
+            color: var(--accent-soft);
+            margin-bottom: 4px;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        /* Hàng action: Mở cáo phó riêng / Xem mã QR */
+        .event-actions {
+            margin-top: 4px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .action-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(248, 220, 140, 0.6);
+            background: rgba(10, 10, 10, 0.65);
+            color: var(--accent-soft);
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+            transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+        }
+
+        .action-pill--primary {
+            background: radial-gradient(circle at top, rgba(248, 220, 140, 0.18), rgba(12, 10, 5, 0.9));
+            color: #fefce8;
+            font-weight: 500;
+        }
+
+        .action-pill--ghost {
+            border-color: rgba(148, 163, 184, 0.7);
+            color: var(--muted);
+            background: rgba(15, 23, 42, 0.75);
+        }
+
+        .action-pill-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            font-size: 11px;
+        }
+
+        .action-pill:hover {
+            transform: translateY(-0.5px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+            border-color: rgba(248, 220, 140, 0.9);
+        }
+
+        .action-pill--ghost:hover {
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        /* Modal QR */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 12px;
+        }
+
+        .modal-backdrop.visible {
+            display: flex;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 520px;
+            border-radius: 18px;
+            background: #050506;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(248, 220, 140, 0.5);
+            position: relative;
+        }
+
+        .obit-header {
+            padding: 18px 16px 8px;
+            text-align: center;
+            background: radial-gradient(circle at top, #252525 0, #050506 55%);
+        }
+
+        .obit-title-top {
+            font-family: "Montserrat", system-ui;
+            font-size: 15px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-soft);
+            font-weight: 700;
+        }
+
+        .obit-subtitle {
+            margin-top: 4px;
+            font-size: 16px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .obit-photo-placeholder {
+            width: 210px;
+            height: 210px;
+            border-radius: 999px;
+            margin: 12px auto 8px;
+            background: radial-gradient(circle at 30% 20%, #444 0, #111 55%, #000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            border: 3px solid rgba(248, 220, 140, 0.9);
+            overflow: hidden;
+        }
+
+        .obit-photo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .obit-name-block {
+            padding: 4px 16px 12px;
+            text-align: center;
+        }
+
+        .obit-role {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 4px;
+        }
+
+        .obit-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-soft);
+        }
+
+        .obit-name-alt {
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .obit-body {
+            padding: 8px 20px 16px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #f3f4ff;
+        }
+
+        .obit-section-title {
+            margin-top: 12px;
+            margin-bottom: 4px;
+            font-weight: 700;
+            color: var(--accent-soft);
+            text-transform: uppercase;
+            font-size: 13px;
+            display: block;
+        }
+
+        .obit-footer {
+            padding: 10px 16px 14px;
+            text-align: center;
+            font-size: 13px;
+            border-top: 1px solid rgba(248, 220, 140, 0.4);
+            color: var(--accent-soft);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            background: rgba(5, 5, 6, 0.9);
+            color: #e5e7eb;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        @media (max-width: 680px) {
+            .events-list {
+                max-height: calc(100vh - 260px);
+            }
+
+            .event-card {
+                grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr);
+                grid-auto-rows: auto;
+                grid-template-areas:
+                    "time name"
+                    "time loc";
+            }
+
+            .event-time {
+                grid-area: time;
+            }
+
+            .event-name {
+                grid-area: name;
+            }
+
+            .event-location {
+                grid-area: loc;
+            }
+
+            .list-header {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Modal QR cho link cáo phó -->
+    <div id="qr-backdrop" class="modal-backdrop">
+        <div class="modal" role="dialog" aria-modal="true" style="max-width:360px;">
+            <button class="modal-close" id="qr-close" aria-label="Đóng">×</button>
+            <div style="padding:16px;text-align:center">
+                <div style="font-size:14px;font-weight:600;margin-bottom:8px;color:var(--accent-soft)">
+                    Mã QR cáo phó
+                </div>
+                <img id="qr-image" src="" alt="QR cáo phó"
+                    style="width:260px;height:260px;border-radius:16px;background:#000;" />
+                <div id="qr-url" style="font-size:11px;margin-top:8px;color:var(--muted);word-break:break-all;"></div>
+                <div style="font-size:11px;margin-top:4px;color:var(--muted);">
+                    Quét QR này để mở trang cáo phó. Có thể nhấn giữ để lưu ảnh, dùng cho in ấn.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page">
+        <header class="page-header">
+            <div class="page-header-inner">
+                <div class="brand-logo">
+                    <!-- TODO: đổi src thành link logo CPHACO thực tế -->
+                    <img src="https://cphaco.app/assets/CPH-LOGO-1.png" alt="CPHACO logo">
+                </div>
+                <div class="brand-text">
+                    <div class="page-title">HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG</div>
+                    <div class="page-subtitle">Danh sách Lễ An táng · Cải táng</div>
+                </div>
+            </div>
+            <div class="page-desc">
+                Dữ liệu lấy tự động từ quy trình AT/CT (workflow 11053). Chỉ hiển thị các ca đang triển khai.
+            </div>
+            <div class="filters-row">
+                <span class="chip">Sắp xếp theo <strong>ngày giờ động quan</strong></span>
+            </div>
+        </header>
+
+        <section class="list-container">
+            <div class="list-header">
+                <div>Thời gian</div>
+                <div>Họ tên</div>
+                <div>Vị trí / Nơi xuất phát</div>
+            </div>
+            <div id="events-list" class="events-list"></div>
+        </section>
+    </div>
+
+    <!-- Modal cáo phó -->
+    <div id="obit-backdrop" class="modal-backdrop">
+        <div class="modal" role="dialog" aria-modal="true">
+            <button class="modal-close" id="obit-close" aria-label="Đóng">×</button>
+
+            <div class="obit-header">
+                <div class="obit-title-top">HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG</div>
+                <div class="obit-subtitle">VÔ CÙNG THƯƠNG TIẾC</div>
+                <div class="obit-photo-placeholder" id="obit-photo-slot">
+                    <span>Ảnh chân dung</span>
+                </div>
+            </div>
+
+            <div class="obit-name-block">
+                <div class="obit-role" id="obit-role">CÁO PHÓ</div>
+                <div class="obit-name" id="obit-name">Họ tên người mất</div>
+                <div class="obit-name-alt" id="obit-name-alt"></div>
+            </div>
+
+            <div class="obit-body" id="obit-body"></div>
+
+            <div class="obit-footer" id="obit-footer">
+                LINH CỮU AN TÁNG TẠI HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = "https://cphaco-backend-api.onrender.com";
+        // const API_BASE_URL = "https://madly-tegminal-sheila.ngrok-free.dev";
+
+        const eventsListEl = document.getElementById("events-list");
+        const obitBackdrop = document.getElementById("obit-backdrop");
+        const obitCloseBtn = document.getElementById("obit-close");
+        const obitNameEl = document.getElementById("obit-name");
+        const obitNameAltEl = document.getElementById("obit-name-alt");
+        const obitBodyEl = document.getElementById("obit-body");
+        const obitFooterEl = document.getElementById("obit-footer");
+
+        const qrBackdrop = document.getElementById("qr-backdrop");
+        const qrCloseBtn = document.getElementById("qr-close");
+        const qrImg = document.getElementById("qr-image");
+        const qrUrlText = document.getElementById("qr-url");
+
+        function openQrModal(url, name) {
+            const qrApi =
+                "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" +
+                encodeURIComponent(url);
+            qrImg.src = qrApi;
+            qrUrlText.textContent = url;
+            qrBackdrop.classList.add("visible");
+        }
+
+        function closeQrModal() {
+            qrBackdrop.classList.remove("visible");
+        }
+
+        qrCloseBtn.addEventListener("click", closeQrModal);
+        qrBackdrop.addEventListener("click", (e) => {
+            if (e.target === qrBackdrop) closeQrModal();
+        });
+
+        function formatDateTime(dtStr) {
+            if (!dtStr) return "";
+            const d = new Date(dtStr);
+            if (Number.isNaN(d.getTime())) return dtStr;
+            const dd = String(d.getDate()).padStart(2, "0");
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const yyyy = d.getFullYear();
+            const hh = String(d.getHours()).padStart(2, "0");
+            const mi = String(d.getMinutes()).padStart(2, "0");
+            return `${hh} giờ ${mi} · ${dd}/${mm}/${yyyy}`;
+        }
+
+        function formatShortDateTime(dtStr) {
+            if (!dtStr) return "";
+            const d = new Date(dtStr);
+            if (Number.isNaN(d.getTime())) return dtStr;
+            const dd = String(d.getDate()).padStart(2, "0");
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const hh = String(d.getHours()).padStart(2, "0");
+            const mi = String(d.getMinutes()).padStart(2, "0");
+            return `${dd}/${mm} · ${hh}:${mi}`;
+        }
+
+        function calcAge(birthYear, refDateStr) {
+            if (!birthYear) return null;
+            const y = Number(birthYear);
+            if (!y) return null;
+            const ref = refDateStr ? new Date(refDateStr) : new Date();
+            const age = ref.getFullYear() - y;
+            return age > 0 ? age : null;
+        }
+
+        function renderEventList(items) {
+            eventsListEl.innerHTML = "";
+            if (!items || !items.length) {
+                eventsListEl.innerHTML =
+                    '<div style="padding:10px;font-size:13px;color:#9ca3af;">Hiện chưa có ca an táng/cải táng nào đang triển khai.</div>';
+                return;
+            }
+
+            items.sort((a, b) => {
+                const ta = a.time_of_funeral ? new Date(a.time_of_funeral).getTime() : 0;
+                const tb = b.time_of_funeral ? new Date(b.time_of_funeral).getTime() : 0;
+                return ta - tb;
+            });
+
+            for (const ev of items) {
+                const card = document.createElement("div");
+                card.className = "event-card";
+                card.dataset.jobId = ev.job_id;
+
+                const timeText = ev.time_of_funeral
+                    ? formatShortDateTime(ev.time_of_funeral)
+                    : (ev.time_of_death ? formatShortDateTime(ev.time_of_death) : "");
+
+                const age = calcAge(
+                    ev.birth_year || ev.birth_year,
+                    ev.time_of_death || ev.time_of_funeral
+                );
+                const ageText = age ? ` · Hưởng thọ ${age} tuổi` : "";
+
+                const position = ev.position || {};
+                const posText = position.khu
+                    ? `${position.tieukhu ? " · " + position.tieukhu : ""}${position.row ? " · Hàng " + position.row : ""}${position.index ? " · Lô " + position.index : ""}`
+                    : "";
+
+                const detailUrl = `atct-obit.html?job=${encodeURIComponent(ev.job_id)}`;
+
+                card.innerHTML = `
+          <div class="event-time">${timeText || ""}</div>
+          <div>
+            <div class="event-badge">An táng / Cải táng</div>
+            <div class="event-name">${ev.name || "Chưa rõ tên"}</div>
+            <div class="event-meta">
+              ${ev.time_of_death ? "Mất lúc: " + formatDateTime(ev.time_of_death) : ""}${ageText}
+            </div>
+            <div class="event-actions">
+              <a href="${detailUrl}" target="_blank"
+                 class="action-pill action-pill--primary obit-link">
+                <span class="action-pill-icon">🕯️</span>
+                <span>Mở cáo phó riêng</span>
+              </a>
+              <button type="button"
+                      class="action-pill action-pill--ghost qr-link"
+                      data-url="${detailUrl}">
+                <span class="action-pill-icon">▢</span>
+                <span>Xem mã QR</span>
+              </button>
+            </div>
+          </div>
+          <div class="event-location">
+            ${posText ? "Vị trí: " + posText + "<br>" : ""}
+            ${ev.departure_place ? "Xuất phát từ: " + ev.departure_place : ""}
+          </div>
+        `;
+
+                card.addEventListener("click", (e) => {
+                    if (e.target.closest(".obit-link") || e.target.closest(".qr-link")) return;
+                    openObitModal(ev);
+                });
+
+                const qrBtn = card.querySelector(".qr-link");
+                qrBtn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openQrModal(qrBtn.dataset.url, ev.name);
+                });
+
+                eventsListEl.appendChild(card);
+            }
+        }
+
+        function openObitModal(ev) {
+            const age = calcAge(
+                ev.birth_year || ev.birth_year,
+                ev.time_of_death || ev.time_of_funeral
+            );
+            obitNameEl.textContent = ev.name || "";
+            obitNameAltEl.textContent = age ? `Hưởng thọ ${age} tuổi` : "";
+
+            const lines = [];
+
+            if (ev.birth_year) {
+                lines.push(`Sinh năm: ${ev.birth_year}`);
+            }
+            if (ev.time_of_death) {
+                lines.push(
+                    `Từ trần lúc ${formatDateTime(ev.time_of_death)}${ev.lunar_date ? " (nhằm ngày " + ev.lunar_date + ")" : ""
+                    }.`
+                );
+            }
+            if (ev.time_of_funeral) {
+                lines.push(`<span class="obit-section-title">NGHI THỨC ĐỘNG QUAN</span>`);
+                lines.push(`Lễ động quan lúc ${formatDateTime(ev.time_of_funeral)}.`);
+            }
+            if (ev.departure_place) {
+                lines.push(`Xuất phát từ: ${ev.departure_place}.`);
+            }
+
+            const position = ev.position || {};
+            const posText = position.khu
+                ? `${position.tieukhu ? " · " + position.tieukhu : ""}${position.row ? " · Hàng " + position.row : ""}${position.index ? " · Lô " + position.index : ""}`
+                : "";
+
+            if (posText) {
+                lines.push(`<span class="obit-section-title">NƠI AN TÁNG</span>`);
+                lines.push(
+                    `Linh cữu an táng tại: ${posText}, Hoa Viên Nghĩa Trang Bình Dương.`
+                );
+            } else {
+                lines.push(`<span class="obit-section-title">NƠI AN TÁNG</span>`);
+                lines.push(
+                    `Linh cữu an táng tại Hoa Viên Nghĩa Trang Bình Dương.`
+                );
+            }
+
+            obitBodyEl.innerHTML = lines
+                .map((ln) => (ln.startsWith("<span") ? ln : `<div>${ln}</div>`))
+                .join("");
+
+            obitFooterEl.textContent =
+                "LINH CỮU AN TÁNG TẠI HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG";
+
+            obitBackdrop.classList.add("visible");
+        }
+
+        function closeObitModal() {
+            obitBackdrop.classList.remove("visible");
+        }
+
+        obitCloseBtn.addEventListener("click", closeObitModal);
+        obitBackdrop.addEventListener("click", (e) => {
+            if (e.target === obitBackdrop) closeObitModal();
+        });
+
+        async function loadEvents() {
+            try {
+                const url = API_BASE_URL + "/api/atct/events";
+                console.log("Calling:", url);
+
+                const res = await fetch(url, {
+                    headers: { "ngrok-skip-browser-warning": "true" }
+                });
+
+                console.log("Status:", res.status);
+
+                const text = await res.text();
+                console.log("Raw response:", text);
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error("Response không phải JSON hợp lệ");
+                }
+
+                if (!data.ok) throw new Error(data.error || "API trả ok=false");
+                renderEventList(data.items || []);
+            } catch (err) {
+                console.error("loadEvents error:", err);
+                eventsListEl.innerHTML =
+                    '<div style="padding:10px;font-size:13px;color:#fecaca;">Không tải được dữ liệu an táng/cải táng. Vui lòng kiểm tra API.</div>';
+            }
+        }
+
+        loadEvents();
+    </script>
+</body>
+
+</html>

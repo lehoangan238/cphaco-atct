@@ -637,7 +637,7 @@
                     ev.birth_year || ev.birth_year,
                     ev.time_of_death || ev.time_of_funeral
                 );
-               // const ageText = age ? ` · Hưởng thọ ${age} tuổi` : "";
+                const ageText ="";
 
                 const position = ev.position || {};
                 const posText = position.khu
@@ -696,7 +696,7 @@
                 ev.time_of_death || ev.time_of_funeral
             );
             obitNameEl.textContent = ev.name || "";
-            // obitNameAltEl.textContent = age ? `Hưởng thọ ${age} tuổi` : "";
+            obitNameAltEl.textContent =  "";
 
             const lines = [];
 

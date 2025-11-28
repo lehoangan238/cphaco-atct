@@ -47,27 +47,6 @@
             }
         }
 
-        /* logo trên modal cáo phó */
-        .obit-logo {
-            width: 52px;
-            height: 52px;
-            border-radius: 999px;
-            border: 1px solid rgba(248, 220, 140, 0.9);
-            background: radial-gradient(circle at 30% 20%, #f4b528 0, #7a5a1c 40%, #000 100%);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.75);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 8px;
-        }
-
-        .obit-logo img {
-            width: 80%;
-            height: 80%;
-            object-fit: contain;
-        }
-
         :root {
             --bg: #050508;
             --card-bg: #111319;
@@ -193,13 +172,24 @@
             background: radial-gradient(circle at left, rgba(244, 181, 40, 0.18), rgba(6, 9, 20, 0.9));
             border: 1px solid rgba(148, 163, 184, 0.4);
             cursor: pointer;
-            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
         }
 
         .event-card:hover {
             transform: translateY(-1px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
             border-color: rgba(244, 181, 40, 0.7);
+        }
+
+        /* Màu khác nhau cho An táng / Cải táng */
+        .event-card--antang {
+            background: radial-gradient(circle at left, rgba(244, 181, 40, 0.20), rgba(6, 9, 20, 0.95));
+            border-color: rgba(248, 220, 140, 0.6);
+        }
+
+        .event-card--caitang {
+            background: radial-gradient(circle at left, rgba(45, 212, 191, 0.20), rgba(6, 12, 20, 0.96));
+            border-color: rgba(56, 189, 248, 0.65);
         }
 
         .event-time {
@@ -210,8 +200,19 @@
         }
 
         .event-name {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 10px;
             font-size: 15px;
             font-weight: 600;
+        }
+
+        .event-birth {
+            font-size: 13px;
+            font-weight: 500;
+            color: #f8d070;
+            letter-spacing: 0.01em;
         }
 
         .event-meta {
@@ -230,11 +231,36 @@
             align-items: center;
             padding: 3px 9px;
             border-radius: 999px;
-            border: 1px solid rgba(244, 181, 40, 0.6);
             font-size: 11px;
-            color: var(--accent-soft);
             margin-bottom: 4px;
             background: rgba(0, 0, 0, 0.35);
+            gap: 6px;
+        }
+
+        .event-badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            display: inline-block;
+        }
+
+        .event-badge--antang {
+            border: 1px solid rgba(248, 220, 140, 0.9);
+            color: #fef9c3;
+        }
+
+        .event-badge--antang .event-badge-dot {
+            background: #facc15;
+        }
+
+        .event-badge--caitang {
+            border: 1px solid rgba(56, 189, 248, 0.9);
+            color: #a5f3fc;
+            background: rgba(8, 47, 73, 0.85);
+        }
+
+        .event-badge--caitang .event-badge-dot {
+            background: #22c55e;
         }
 
         /* Hàng action: Mở cáo phó riêng / Xem mã QR */
@@ -490,8 +516,7 @@
         <header class="page-header">
             <div class="page-header-inner">
                 <div class="brand-logo">
-                    <!-- TODO: đổi src thành link logo CPHACO thực tế -->
-                    <img src="https://cphaco.app/assets/CPH-LOGO-1.png" alt="CPHACO logo">
+                    <img src="CPH LOGO 1.png" alt="CPHACO logo">
                 </div>
                 <div class="brand-text">
                     <div class="page-title">HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG</div>
@@ -499,7 +524,7 @@
                 </div>
             </div>
             <div class="page-desc">
-                Dữ liệu lấy tự động từ quy trình AT/CT (workflow 11053). Chỉ hiển thị các ca đang triển khai.
+          
             </div>
             <div class="filters-row">
                 <span class="chip">Sắp xếp theo <strong>ngày giờ động quan</strong></span>
@@ -554,13 +579,14 @@
         const obitNameAltEl = document.getElementById("obit-name-alt");
         const obitBodyEl = document.getElementById("obit-body");
         const obitFooterEl = document.getElementById("obit-footer");
+        const obitRoleEl = document.getElementById("obit-role");
 
         const qrBackdrop = document.getElementById("qr-backdrop");
         const qrCloseBtn = document.getElementById("qr-close");
         const qrImg = document.getElementById("qr-image");
         const qrUrlText = document.getElementById("qr-url");
 
-        function openQrModal(url, name) {
+        function openQrModal(url) {
             const qrApi =
                 "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" +
                 encodeURIComponent(url);
@@ -601,6 +627,7 @@
             return `${dd}/${mm} · ${hh}:${mi}`;
         }
 
+        // fallback nếu sau này cần tính lại
         function calcAge(birthYear, refDateStr) {
             if (!birthYear) return null;
             const y = Number(birthYear);
@@ -608,6 +635,28 @@
             const ref = refDateStr ? new Date(refDateStr) : new Date();
             const age = ref.getFullYear() - y;
             return age > 0 ? age : null;
+        }
+
+        // Lấy thông tin loại lễ từ ev.ceremony_type
+        function getCeremonyInfo(ev) {
+            const raw = (ev.ceremony_type || ev.type || "").toString().trim();
+            if (!raw) {
+                return { key: "antang", label: "An táng" };
+            }
+            const norm = raw
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+
+            if (norm.includes("cai tang")) {
+                return { key: "caitang", label: "Cải táng" };
+            }
+            if (norm.includes("an tang")) {
+                return { key: "antang", label: "An táng" };
+            }
+            // fallback: dùng raw làm label, nhưng key mặc định an táng
+            return { key: "antang", label: raw };
         }
 
         function renderEventList(items) {
@@ -618,6 +667,7 @@
                 return;
             }
 
+            // sắp xếp theo time_of_funeral
             items.sort((a, b) => {
                 const ta = a.time_of_funeral ? new Date(a.time_of_funeral).getTime() : 0;
                 const tb = b.time_of_funeral ? new Date(b.time_of_funeral).getTime() : 0;
@@ -625,32 +675,45 @@
             });
 
             for (const ev of items) {
+                const typeInfo = getCeremonyInfo(ev);
+
                 const card = document.createElement("div");
-                card.className = "event-card";
+                card.className = "event-card event-card--" + typeInfo.key;
                 card.dataset.jobId = ev.job_id;
 
                 const timeText = ev.time_of_funeral
                     ? formatShortDateTime(ev.time_of_funeral)
                     : (ev.time_of_death ? formatShortDateTime(ev.time_of_death) : "");
 
-                const age = calcAge(
-                    ev.birth_year || ev.birth_year,
-                    ev.time_of_death || ev.time_of_funeral
-                );
-                const ageText ="";
+                // Hưởng dương / Hưởng thọ: ưu tiên ev.age_phrase
+                const ageText = ev.age_phrase ? " · " + ev.age_phrase : "";
 
                 const position = ev.position || {};
                 const posText = position.khu
-                    ? `${position.tieukhu ? " · " + position.tieukhu : ""}${position.row ? " · Hàng " + position.row : ""}${position.index ? " · Lô " + position.index : ""}`
+                    ? 
+                    `${position.tieukhu ? " · " + position.tieukhu : ""}` +
+                    `${position.row ? " · Hàng " + position.row : ""}` +
+                    `${position.index ? " · Lô " + position.index : ""}`
                     : "";
 
-                const detailUrl = `atct-obit.html?job=${encodeURIComponent(ev.job_id)}`;
+                // Link cáo phó riêng trên domain chính
+                const detailUrl = `https://cphaco-atct.vercel.app/atct-obit.html?job=${encodeURIComponent(ev.job_id)}`;
+
+                const name = ev.name || ev.deceased_name || "Chưa rõ tên";
+                const birthYear = ev.deceased_birth_year || ev.birth_year || null;
 
                 card.innerHTML = `
           <div class="event-time">${timeText || ""}</div>
           <div>
-            <div class="event-badge">An táng / Cải táng</div>
-            <div class="event-name">${ev.name || "Chưa rõ tên"}</div>
+            <div class="event-badge event-badge--${typeInfo.key}">
+              <span class="event-badge-dot"></span>
+              <span>${typeInfo.label}</span>
+            </div>
+            <div class="event-name">
+              <span>${name}</span>
+              
+            </div>
+            ${birthYear ? `<span class="event-birth">Năm sinh: ${birthYear}</span>` : ""}
             <div class="event-meta">
               ${ev.time_of_death ? "Mất lúc: " + formatDateTime(ev.time_of_death) : ""}${ageText}
             </div>
@@ -683,7 +746,7 @@
                 qrBtn.addEventListener("click", (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    openQrModal(qrBtn.dataset.url, ev.name);
+                    openQrModal(qrBtn.dataset.url);
                 });
 
                 eventsListEl.appendChild(card);
@@ -691,17 +754,30 @@
         }
 
         function openObitModal(ev) {
-            const age = calcAge(
-                ev.birth_year || ev.birth_year,
-                ev.time_of_death || ev.time_of_funeral
-            );
-            obitNameEl.textContent = ev.name || "";
-            obitNameAltEl.textContent =  "";
+            const typeInfo = getCeremonyInfo(ev);
+
+            const name = ev.name || ev.deceased_name || "";
+            obitNameEl.textContent = name;
+
+            // Dòng "Hưởng dương / Hưởng thọ" lấy từ API
+            if (ev.age_phrase) {
+                obitNameAltEl.textContent = ev.age_phrase;
+            } else {
+                const age = calcAge(
+                    ev.birth_year || ev.deceased_birth_year,
+                    ev.time_of_death || ev.time_of_funeral
+                );
+                obitNameAltEl.textContent = age ? `Hưởng thọ ${age} tuổi` : "";
+            }
+
+            // Dòng trên cùng: AN TÁNG / CẢI TÁNG
+            obitRoleEl.textContent = typeInfo.label.toUpperCase();
 
             const lines = [];
 
-            if (ev.birth_year) {
-                lines.push(`Sinh năm: ${ev.birth_year}`);
+            const year = ev.birth_year || ev.deceased_birth_year;
+            if (year) {
+                lines.push(`Sinh năm: ${year}`);
             }
             if (ev.time_of_death) {
                 lines.push(
@@ -719,18 +795,20 @@
 
             const position = ev.position || {};
             const posText = position.khu
-                ? `${position.tieukhu ? " · " + position.tieukhu : ""}${position.row ? " · Hàng " + position.row : ""}${position.index ? " · Lô " + position.index : ""}`
+                ?
+                `${position.tieukhu ? " · " + position.tieukhu : ""}` +
+                `${position.row ? " · Hàng " + position.row : ""}` +
+                `${position.index ? " · Lô " + position.index : ""}`
                 : "";
 
+            lines.push(`<span class="obit-section-title">NƠI AN TÁNG</span>`);
             if (posText) {
-                lines.push(`<span class="obit-section-title">NƠI AN TÁNG</span>`);
                 lines.push(
-                    `Linh cữu an táng tại: ${posText}, Hoa Viên Nghĩa Trang Bình Dương.`
+                    `Linh cữu ${typeInfo.label.toLowerCase()} tại: ${posText}, Hoa Viên Nghĩa Trang Bình Dương.`
                 );
             } else {
-                lines.push(`<span class="obit-section-title">NƠI AN TÁNG</span>`);
                 lines.push(
-                    `Linh cữu an táng tại Hoa Viên Nghĩa Trang Bình Dương.`
+                    `Linh cữu ${typeInfo.label.toLowerCase()} tại Hoa Viên Nghĩa Trang Bình Dương.`
                 );
             }
 
@@ -739,7 +817,7 @@
                 .join("");
 
             obitFooterEl.textContent =
-                "LINH CỮU AN TÁNG TẠI HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG";
+                `LINH CỮU ${typeInfo.label.toUpperCase()} TẠI HOA VIÊN NGHĨA TRANG BÌNH DƯƠNG`;
 
             obitBackdrop.classList.add("visible");
         }

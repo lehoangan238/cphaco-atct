@@ -714,8 +714,10 @@
               
             </div>
             ${birthYear ? `<span class="event-birth">Năm sinh: ${birthYear}</span>` : ""}
+            ${ev.age_phrase  ? `<div class="event-birth"> Hưởng dương ${ev.age_phrase} tuổi</div>` : ""}
+
             <div class="event-meta">
-              ${ev.time_of_death ? "Mất lúc: " + formatDateTime(ev.time_of_death) : ""}${ageText}
+              ${ev.time_of_death ? "Mất lúc: " + formatDateTime(ev.time_of_death) : ""}
             </div>
             <div class="event-actions">
               <a href="${detailUrl}" target="_blank"

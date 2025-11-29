@@ -233,19 +233,24 @@
         statusEl.textContent = "Không tìm thấy dữ liệu cáo phó.";
         return;
       }
-
       const r = data.item;
       const ev = {
-        name: r.deceased?.name,
-        birth_year: r.deceased?.birth_year,
+        name: r.deceased?.name || r.deceased_name,
+        birth_year: r.deceased?.birth_year || r.deceased_birth_year,
+        age_phrase: r.age_phrase,
         time_of_death: r.time_of_death,
         time_of_funeral: r.time_of_funeral,
         lunar_date: r.lunar_date,
         departure_place: r.departure_place,
-        position: r.position || {}
+        position: r.position || {},
+        position_khu: r.position_khu,
+        position_tieukhu: r.position_tieukhu,
+        position_tieukhu_no: r.position_tieukhu_no,
+        position_row: r.position_row,
+        position_index: r.position_index
       };
 
-      const age = calcAge(ev.birth_year, ev.time_of_death || ev.time_of_funeral);
+      const age = ev.age_phrase || calcAge(ev.birth_year, ev.time_of_death || ev.time_of_funeral);
       obitNameEl.textContent = ev.name || "";
       obitNameAltEl.textContent = age ? `Hưởng thọ ${age} tuổi` : "";
 
@@ -264,21 +269,25 @@
         lines.push(`Xuất phát từ: ${ev.departure_place}.`);
       }
 
-      const pos = ev.position;
-      // Build position text: use only tieukhu for compact format like "Khu E2.1 · Hàng 03 · Lô 02"
+      // Build position text: support both nested position object and flat SQL fields
       const posText = (() => {
-        if (!pos) return "";
         const parts = [];
-        if (pos.tieukhu) {
-          parts.push(`Khu ${pos.tieukhu}`);
-        } else if (pos.khu) {
-          parts.push(`Khu ${pos.khu}`);
+        // Prefer flat fields, fallback to nested position object
+        const tieukhu = ev.position_tieukhu || ev.position?.tieukhu;
+        const khu = ev.position_khu || ev.position?.khu;
+        const row = ev.position_row || ev.position?.row;
+        const index = ev.position_index || ev.position?.index;
+        
+        if (tieukhu) {
+          parts.push(`Khu ${tieukhu}`);
+        } else if (khu) {
+          parts.push(`Khu ${khu}`);
         }
-        if (pos.row) parts.push(`Hàng ${pos.row}`);
-        if (pos.index) parts.push(`Lô ${pos.index}`);
+        if (row) parts.push(`Hàng ${row}`);
+        if (index) parts.push(`Lô ${index}`);
         return parts.join(" · ");
       })();
-
+      console.log("Position text:", posText);
       lines.push('<span class="obit-section-title">NƠI AN TÁNG</span>');
       if (posText) {
         lines.push(`Linh cữu an táng tại: ${posText}, Hoa Viên Nghĩa Trang Bình Dương.`);

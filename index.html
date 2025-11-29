@@ -588,7 +588,7 @@
             <div id="events-list" class="events-list">
                 <div class="loading-container">
                     <div class="spinner"></div>
-                    <div class="loading-text">Đang tải dữ liệu đám tang...</div>
+                    <div class="loading-text">Đang tải dữ liệu</div>
                     <div class="loading-sub">Vui lòng đợi giây lát nếu Server đang khởi động lại</div>
                 </div>
             </div>
@@ -746,7 +746,7 @@
                 const ageText = ev.age_phrase ? " · " + ev.age_phrase : "";
 
                 const posText = buildPositionFromEvent(ev);
-                console.log(posText);
+            
                 
                 // Link cáo phó riêng trên domain chính
                 const detailUrl = `https://cphaco-atct.vercel.app/atct-obit.html?job=${encodeURIComponent(ev.job_id)}`;
@@ -943,7 +943,6 @@
         async function loadEvents() {
             try {
                 const url = API_BASE_URL + "/api/atct/events";
-                console.log("Calling:", url);
 
                 const res = await fetch(url, {
                     headers: { "ngrok-skip-browser-warning": "true" }
@@ -952,7 +951,6 @@
                 console.log("Status:", res.status);
 
                 const text = await res.text();
-                console.log("Raw response:", text);
 
                 let data;
                 try {

@@ -206,6 +206,8 @@
             gap: 10px;
             font-size: 15px;
             font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 2px;
         }
 
         .event-birth {
@@ -213,17 +215,21 @@
             font-weight: 500;
             color: #f8d070;
             letter-spacing: 0.01em;
+            line-height: 1.6;
+            margin-top: 4px;
         }
 
         .event-meta {
             font-size: 12px;
             color: var(--muted);
-            margin-top: 2px;
+            margin-top: 6px;
+            line-height: 1.5;
         }
 
         .event-location {
             font-size: 12px;
             color: var(--muted);
+            line-height: 1.6;
         }
 
         .event-badge {
@@ -265,7 +271,7 @@
 
         /* Hàng action: Mở cáo phó riêng / Xem mã QR */
         .event-actions {
-            margin-top: 4px;
+            margin-top: 8px;
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
@@ -490,6 +496,46 @@
                 display: none;
             }
         }
+
+        /* --- LOADING SPINNER CSS --- */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(248, 220, 140, 0.2);
+            border-top-color: var(--accent);
+            /* Màu vàng */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .loading-sub {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 6px;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -524,10 +570,12 @@
                 </div>
             </div>
             <div class="page-desc">
-          
+
             </div>
             <div class="filters-row">
                 <span class="chip">Sắp xếp theo <strong>ngày giờ động quan</strong></span>
+                <input id="search-input" type="text" placeholder="Tìm theo tên, vị trí hoặc nơi xuất phát" 
+                       style="flex:1;min-width:260px;max-width:520px;padding:8px 12px;border-radius:999px;border:1px solid rgba(244,181,40,0.3);background:rgba(0,0,0,0.4);color:#f7f7fb;" />
             </div>
         </header>
 
@@ -537,7 +585,13 @@
                 <div>Họ tên</div>
                 <div>Vị trí / Nơi xuất phát</div>
             </div>
-            <div id="events-list" class="events-list"></div>
+            <div id="events-list" class="events-list">
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Đang tải dữ liệu đám tang...</div>
+                    <div class="loading-sub">Vui lòng đợi giây lát nếu Server đang khởi động lại</div>
+                </div>
+            </div>
         </section>
     </div>
 
@@ -573,6 +627,7 @@
         // const API_BASE_URL = "https://madly-tegminal-sheila.ngrok-free.dev";
 
         const eventsListEl = document.getElementById("events-list");
+        const searchInputEl = document.getElementById("search-input");
         const obitBackdrop = document.getElementById("obit-backdrop");
         const obitCloseBtn = document.getElementById("obit-close");
         const obitNameEl = document.getElementById("obit-name");
@@ -659,6 +714,8 @@
             return { key: "antang", label: raw };
         }
 
+        let allItems = [];
+
         function renderEventList(items) {
             eventsListEl.innerHTML = "";
             if (!items || !items.length) {
@@ -688,14 +745,9 @@
                 // Hưởng dương / Hưởng thọ: ưu tiên ev.age_phrase
                 const ageText = ev.age_phrase ? " · " + ev.age_phrase : "";
 
-                const position = ev.position || {};
-                const posText = position.khu
-                    ? 
-                    `${position.tieukhu ? " · " + position.tieukhu : ""}` +
-                    `${position.row ? " · Hàng " + position.row : ""}` +
-                    `${position.index ? " · Lô " + position.index : ""}`
-                    : "";
-
+                const posText = buildPositionFromEvent(ev);
+                console.log(posText);
+                
                 // Link cáo phó riêng trên domain chính
                 const detailUrl = `https://cphaco-atct.vercel.app/atct-obit.html?job=${encodeURIComponent(ev.job_id)}`;
 
@@ -710,11 +762,9 @@
               <span>${typeInfo.label}</span>
             </div>
             <div class="event-name">
-              <span>${name}</span>
-              
+              <span>${name} ${birthYear ? `(${birthYear})` : ""}</span>
             </div>
-            ${birthYear ? `<span class="event-birth">Năm sinh: ${birthYear}</span>` : ""}
-            ${ev.age_phrase  ? `<div class="event-birth"> Hưởng dương ${ev.age_phrase} tuổi</div>` : ""}
+            ${ev.age_phrase ? `<div class="event-birth">Hưởng dương ${ev.age_phrase} tuổi</div>` : ""}
 
             <div class="event-meta">
               ${ev.time_of_death ? "Mất lúc: " + formatDateTime(ev.time_of_death) : ""}
@@ -733,10 +783,10 @@
               </button>
             </div>
           </div>
-          <div class="event-location">
-            ${posText ? "Vị trí: " + posText + "<br>" : ""}
-            ${ev.departure_place ? "Xuất phát từ: " + ev.departure_place : ""}
-          </div>
+                    <div class="event-location">
+                        ${posText ? "Vị trí: " + posText + "<br>" : ""}
+                        ${ev.departure_place ? "Xuất phát từ: " + ev.departure_place : ""}
+                    </div>
         `;
 
                 card.addEventListener("click", (e) => {
@@ -753,6 +803,69 @@
 
                 eventsListEl.appendChild(card);
             }
+        }
+        function buildPositionText(position) {
+            const p = position || {};
+            const parts = [];
+            // Use only tieukhu for compact format
+            if (p.tieukhu) {
+                parts.push(`Khu ${p.tieukhu}`);
+            }
+            if (p.row) parts.push(`Hàng ${p.row}`);
+            if (p.index) parts.push(`Lô ${p.index}`);
+            return parts.join(" · ");
+        }
+
+        function buildPositionFromEvent(ev) {
+            if (ev && ev.position) {
+                return buildPositionText(ev.position);
+            }
+            const p = {
+                khu: ev && ev.position_khu,
+                tieukhu: ev && ev.position_tieukhu,
+                tieukhu_no: ev && ev.position_tieukhu_no,
+                row: ev && ev.position_row,
+                index: ev && ev.position_index,
+            };
+            return buildPositionText(p);
+        }
+
+        function normalizeText(s) {
+            return (s || "")
+                .toString()
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+        }
+
+        function applySearchFilter() {
+            const q = normalizeText(searchInputEl ? searchInputEl.value : "");
+            if (!q) {
+                renderEventList(allItems);
+                return;
+            }
+            const filtered = allItems.filter(ev => {
+                const name = normalizeText(ev.name || ev.deceased_name);
+                const pos = (() => {
+                    const parts = [];
+                    const p = ev.position || {};
+                    const khu = p.khu ?? ev.position_khu;
+                    const tieukhu = p.tieukhu ?? ev.position_tieukhu;
+                    const tieukhu_no = p.tieukhu_no ?? ev.position_tieukhu_no;
+                    const row = p.row ?? ev.position_row;
+                    const index = p.index ?? ev.position_index;
+                    if (khu) parts.push(khu);
+                    if (tieukhu) parts.push(tieukhu);
+                    if (tieukhu_no) parts.push(tieukhu_no);
+                    if (row) parts.push(row);
+                    if (index) parts.push(index);
+                    return normalizeText(parts.join(" "));
+                })();
+                const dep = normalizeText(ev.departure_place);
+                return name.includes(q) || pos.includes(q) || dep.includes(q);
+            });
+            renderEventList(filtered);
         }
 
         function openObitModal(ev) {
@@ -795,13 +908,7 @@
                 lines.push(`Xuất phát từ: ${ev.departure_place}.`);
             }
 
-            const position = ev.position || {};
-            const posText = position.khu
-                ?
-                `${position.tieukhu ? " · " + position.tieukhu : ""}` +
-                `${position.row ? " · Hàng " + position.row : ""}` +
-                `${position.index ? " · Lô " + position.index : ""}`
-                : "";
+            const posText = buildPositionFromEvent(ev);
 
             lines.push(`<span class="obit-section-title">NƠI AN TÁNG</span>`);
             if (posText) {
@@ -855,7 +962,8 @@
                 }
 
                 if (!data.ok) throw new Error(data.error || "API trả ok=false");
-                renderEventList(data.items || []);
+                allItems = data.items || [];
+                renderEventList(allItems);
             } catch (err) {
                 console.error("loadEvents error:", err);
                 eventsListEl.innerHTML =
@@ -864,6 +972,10 @@
         }
 
         loadEvents();
+
+        if (searchInputEl) {
+            searchInputEl.addEventListener("input", applySearchFilter);
+        }
     </script>
 </body>
 

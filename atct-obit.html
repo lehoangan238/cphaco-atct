@@ -126,6 +126,30 @@
       color: var(--accent-soft);
       text-decoration: none;
     }
+    /* Thêm vào cuối thẻ style */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top, #1c1f2c 0, #050508 55%);
+    z-index: 50;
+    transition: opacity 0.3s ease;
+}
+.spinner {
+    width: 45px;
+    height: 45px;
+    border: 3px solid rgba(248, 220, 140, 0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 14px; color: var(--muted); }
+.hidden { opacity: 0; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -241,9 +265,19 @@
       }
 
       const pos = ev.position;
-      const posText = pos.khu
-        ? `${pos.khu}${pos.tieukhu ? " · " + pos.tieukhu : ""}${pos.row ? " · Hàng " + pos.row : ""}${pos.index ? " · Ô " + pos.index : ""}`
-        : "";
+      // Build position text: use only tieukhu for compact format like "Khu E2.1 · Hàng 03 · Lô 02"
+      const posText = (() => {
+        if (!pos) return "";
+        const parts = [];
+        if (pos.tieukhu) {
+          parts.push(`Khu ${pos.tieukhu}`);
+        } else if (pos.khu) {
+          parts.push(`Khu ${pos.khu}`);
+        }
+        if (pos.row) parts.push(`Hàng ${pos.row}`);
+        if (pos.index) parts.push(`Lô ${pos.index}`);
+        return parts.join(" · ");
+      })();
 
       lines.push('<span class="obit-section-title">NƠI AN TÁNG</span>');
       if (posText) {

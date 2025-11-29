@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Danh sách An táng / Cải táng · Hoa Viên Nghĩa Trang Bình Dương</title>
+    <link rel="icon" href="/CPH LOGO 1.png" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Roboto:wght@400;500;700&display=swap"
@@ -574,8 +575,8 @@
             </div>
             <div class="filters-row">
                 <span class="chip">Sắp xếp theo <strong>ngày giờ động quan</strong></span>
-                <input id="search-input" type="text" placeholder="Tìm theo tên, vị trí hoặc nơi xuất phát" 
-                       style="flex:1;min-width:260px;max-width:520px;padding:8px 12px;border-radius:999px;border:1px solid rgba(244,181,40,0.3);background:rgba(0,0,0,0.4);color:#f7f7fb;" />
+                <input id="search-input" type="text" placeholder="Tìm theo tên, vị trí hoặc nơi xuất phát"
+                    style="flex:1;min-width:260px;max-width:520px;padding:8px 12px;border-radius:999px;border:1px solid rgba(244,181,40,0.3);background:rgba(0,0,0,0.4);color:#f7f7fb;" />
             </div>
         </header>
 
@@ -746,8 +747,8 @@
                 const ageText = ev.age_phrase ? " · " + ev.age_phrase : "";
 
                 const posText = buildPositionFromEvent(ev);
-            
-                
+
+
                 // Link cáo phó riêng trên domain chính
                 const detailUrl = `https://cphaco-atct.vercel.app/atct-obit.html?job=${encodeURIComponent(ev.job_id)}`;
 
